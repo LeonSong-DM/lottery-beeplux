@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beeplux Lottery</title>
+    <style>
+        :root {
+            --bg-1: #0f1a1f;
+            --bg-2: #1b2a34;
+            --accent: #f2c96d;
+            --pill-bg: rgba(255, 255, 255, 0.08);
+            --pill-border: rgba(255, 255, 255, 0.18);
+            --text: #f4f1ec;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: "Palatino Linotype", Palatino, "Book Antiqua", serif;
+            background:
+                radial-gradient(1200px 600px at 10% 10%, rgba(242, 201, 109, 0.2), transparent 60%),
+                radial-gradient(900px 500px at 90% 90%, rgba(130, 198, 255, 0.18), transparent 55%),
+                linear-gradient(145deg, var(--bg-1), var(--bg-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        .frame {
+            width: 85vw;
+            max-width: 1400px;
+            min-height: 85vh;
+            background: rgba(7, 10, 12, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 28px 24px 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        h1 {
+            margin: -24px 0 12px;
+            font-size: clamp(2rem, 3vw, 3.1rem);
+            letter-spacing: 0.04em;
+        }
+
+        .game-switch {
+            display: flex;
+            gap: 10px;
+            margin-top: -24px;
+        }
+
+        .game-btn {
+            font-family: "Palatino Linotype", Palatino, "Book Antiqua", serif;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 999px;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .game-btn.active {
+            background: rgba(242, 201, 109, 0.3);
+            border-color: rgba(242, 201, 109, 0.6);
+            color: #1b1710;
+        }
+
+        .rows {
+            display: grid;
+            gap: 18px;
+        }
+
+        .row {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            padding: 12px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .track {
+            position: relative;
+            overflow: hidden;
+            height: 72px;
+        }
+
+        .strip-group {
+            display: flex;
+            width: max-content;
+        }
+
+        .strip {
+            display: inline-flex;
+            gap: 12px;
+            align-items: center;
+            padding-right: 12px;
+        }
+
+        .num {
+            min-width: 56px;
+            padding: 12px 16px;
+            text-align: center;
+            border-radius: 999px;
+            background: var(--pill-bg);
+            border: 1px solid var(--pill-border);
+            font-size: 1.35rem;
+            letter-spacing: 0.04em;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        }
+
+        .num.drawn-anim {
+            animation: draw-pulse 0.9s ease;
+            background: rgba(242, 201, 109, 0.45);
+            border-color: rgba(242, 201, 109, 0.9);
+            color: #1b1710;
+            box-shadow: 0 0 14px rgba(242, 201, 109, 0.5);
+        }
+
+        .track.left .strip-group {
+            animation: scroll-left var(--scroll-duration, 20s) linear infinite;
+        }
+
+        .track.right .strip-group {
+            animation: scroll-right var(--scroll-duration, 20s) linear infinite;
+        }
+
+        @keyframes scroll-left {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        @keyframes scroll-right {
+            from {
+                transform: translateX(-50%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes draw-pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .controls {
+            margin-top: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            font-size: 1.05rem;
+            letter-spacing: 0.03em;
+            opacity: 0.9;
+        }
+
+        .drawn {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .drawn .num {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .drawn .num.current {
+            background: rgba(242, 201, 109, 0.5);
+            border-color: rgba(242, 201, 109, 0.9);
+            color: #1b1710;
+            box-shadow: 0 0 12px rgba(242, 201, 109, 0.4);
+        }
+
+        .start-btn {
+            font-family: "Palatino Linotype", Palatino, "Book Antiqua", serif;
+            background: rgba(242, 201, 109, 0.25);
+            border: 1px solid rgba(242, 201, 109, 0.6);
+            color: #1b1710;
+            padding: 10px 18px;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-1px);
+            background: rgba(242, 201, 109, 0.35);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 700px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .game-switch {
+                margin-top: 0;
+            }
+
+            .track {
+                height: 58px;
+            }
+
+            .num {
+                min-width: 46px;
+                font-size: 1.1rem;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="frame">
+        <div class="header">
+            <h1>Beeplux 2026 Lottery</h1>
+            <div class="game-switch"></div>
+        </div>
+        <div class="rows">
+            <div class="row">
+                <div class="track"></div>
+            </div>
+            <div class="row">
+                <div class="track"></div>
+            </div>
+            <div class="row">
+                <div class="track"></div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="status" id="drawStatus">&#26410;&#24320;&#22987;&#25277;&#21462;</div>
+            <button class="start-btn" id="startBtn" type="button">Start</button>
+        </div>
+        <div class="drawn" id="drawnList"></div>
+    </div>
+
+    <script src="./game-config.js"></script>
+    <script>
+        const tracks = Array.from(document.querySelectorAll(".track"));
+        const switcher = document.querySelector(".game-switch");
+        const statusEl = document.getElementById("drawStatus");
+        const startBtn = document.getElementById("startBtn");
+        const drawnList = document.getElementById("drawnList");
+        let currentGame = null;
+        let globalTotalNumbers = 60;
+        let currentDrawnCount = 0;
+        let globalUsedNumbers = new Set();
+        let displayedDrawnNumbers = [];
+        let currentRound = 0;
+        let roundIndex = 0;
+        let roundPool = [];
+        let drawTimer = null;
+        let middleTimer = null;
+        let randomTimer = null;
+        let excludedRange = null;
+
+        function isExcludedNumber(num) {
+            if (!excludedRange) {
+                return false;
+            }
+            return num >= excludedRange.min && num <= excludedRange.max;
+        }
+
+        function buildEligibleNumbers(totalNumbers) {
+            const list = [];
+            for (let n = 1; n <= totalNumbers; n += 1) {
+                if (!isExcludedNumber(n)) {
+                    list.push(n);
+                }
+            }
+            return list;
+        }
+
+        function getEligibleCount() {
+            return buildEligibleNumbers(globalTotalNumbers).length;
+        }
+
+        function shuffle(list) {
+            for (let i = list.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [list[i], list[j]] = [list[j], list[i]];
+            }
+            return list;
+        }
+
+        function applyDirections(config) {
+            const directions = Array.isArray(config.rowDirections)
+                ? config.rowDirections
+                : [];
+
+            tracks.forEach((track, index) => {
+                const direction = directions[index] || (index === 1 ? "right" : "left");
+                track.classList.remove("left", "right");
+                track.classList.add(direction === "right" ? "right" : "left");
+            });
+        }
+
+        function ensureStripFilled(strip, track) {
+            const trackWidth = track.getBoundingClientRect().width;
+            if (!trackWidth) {
+                return;
+            }
+
+            const originals = Array.from(strip.children);
+            if (!originals.length) {
+                return;
+            }
+
+            let stripWidth = strip.getBoundingClientRect().width;
+            let safety = 0;
+            while (stripWidth < trackWidth * 1.2 && safety < 50) {
+                originals.forEach((node) => {
+                    strip.appendChild(node.cloneNode(true));
+                });
+                stripWidth = strip.getBoundingClientRect().width;
+                safety += 1;
+            }
+        }
+
+        function refreshTrackNumbers(track, totalNumbers) {
+            const pills = track.querySelectorAll(".num");
+            if (!pills.length) {
+                return;
+            }
+            pills.forEach((pill) => {
+                const num = Math.floor(Math.random() * totalNumbers) + 1;
+                pill.textContent = String(num).padStart(2, "0");
+                pill.dataset.num = String(num);
+            });
+        }
+
+        function buildTrack(track, numbers, durationSeconds) {
+            const group = document.createElement("div");
+            group.className = "strip-group";
+            const strip = document.createElement("div");
+            strip.className = "strip";
+
+            numbers.forEach((num) => {
+                const pill = document.createElement("span");
+                pill.className = "num";
+                pill.textContent = String(num).padStart(2, "0");
+                pill.dataset.num = String(num);
+                strip.appendChild(pill);
+            });
+
+            group.appendChild(strip);
+            track.innerHTML = "";
+            track.appendChild(group);
+
+            requestAnimationFrame(() => {
+                ensureStripFilled(strip, track);
+                const trackWidth = track.getBoundingClientRect().width || 1;
+                const stripWidth = strip.getBoundingClientRect().width || trackWidth;
+                const scaledDuration = durationSeconds * (stripWidth / trackWidth);
+                track.style.setProperty("--scroll-duration", `${scaledDuration}s`);
+                group.innerHTML = "";
+                group.appendChild(strip);
+                group.appendChild(strip.cloneNode(true));
+            });
+        }
+
+        function buildTracks(config) {
+            const totalNumbers = globalTotalNumbers;
+            const totalNeeded = config.winnersPerRound * config.rounds;
+            const pool = shuffle(Array.from({ length: totalNumbers }, (_, i) => i + 1));
+            const numbers = pool.slice(0, Math.min(totalNeeded, pool.length));
+            const chunkSize = Math.ceil(numbers.length / tracks.length);
+            const rowDurations = Array.isArray(config.rowDurationSeconds)
+                ? config.rowDurationSeconds
+                : [];
+            const baseDuration = typeof config.scrollDurationSeconds === "number"
+                ? config.scrollDurationSeconds
+                : 20;
+
+            if (totalNeeded > pool.length) {
+                console.warn("Requested more than 60 unique numbers; capped at 60.");
+            }
+
+            tracks.forEach((track, index) => {
+                const duration = rowDurations[index] ?? baseDuration;
+                const slice = numbers.slice(index * chunkSize, (index + 1) * chunkSize);
+                const displayNumbers = config.randomizeRows
+                    ? Array.from({ length: Math.max(chunkSize, 3) }, () => Math.floor(Math.random() * totalNumbers) + 1)
+                    : slice;
+                buildTrack(track, displayNumbers, duration);
+            });
+
+            if (middleTimer) {
+                clearInterval(middleTimer);
+                middleTimer = null;
+            }
+
+            if (randomTimer) {
+                clearInterval(randomTimer);
+                randomTimer = null;
+            }
+
+            const middleTrack = tracks[1];
+            if (middleTrack) {
+                const middleDuration = rowDurations[1] ?? baseDuration;
+                middleTrack.classList.add("randomizing");
+                refreshTrackNumbers(middleTrack, totalNumbers);
+                middleTimer = setInterval(() => {
+                    middleTrack.style.setProperty("--scroll-duration", `${middleDuration}s`);
+                    refreshTrackNumbers(middleTrack, totalNumbers);
+                }, 1200);
+            }
+
+            if (config.randomizeRows) {
+                const refreshMs = typeof config.randomRefreshMs === "number"
+                    ? config.randomRefreshMs
+                    : 1200;
+                randomTimer = setInterval(() => {
+                    tracks.forEach((track) => {
+                        track.classList.add("randomizing");
+                        refreshTrackNumbers(track, totalNumbers);
+                    });
+                }, refreshMs);
+            } else {
+                tracks.forEach((track) => track.classList.remove("randomizing"));
+            }
+        }
+
+        function buildSegmentRoundPool(game, round) {
+            const totalNumbers = globalTotalNumbers;
+            const winners = game.winnersPerRound;
+            const totalSegments = winners * game.rounds;
+            const eligibleNumbers = buildEligibleNumbers(totalNumbers);
+            const eligibleCount = eligibleNumbers.length;
+            const segmentSize = Math.floor(eligibleCount / totalSegments) || 1;
+            const picks = [];
+
+            for (let i = 0; i < winners; i += 1) {
+                const segmentIndex = (round - 1) * winners + i;
+                const startIndex = segmentIndex * segmentSize;
+                const endIndex = segmentIndex === totalSegments - 1
+                    ? eligibleCount
+                    : Math.min(eligibleCount, (segmentIndex + 1) * segmentSize);
+                const candidates = eligibleNumbers
+                    .slice(startIndex, endIndex)
+                    .filter((n) => !globalUsedNumbers.has(n));
+                if (candidates.length === 0) {
+                    return null;
+                }
+                const pick = candidates[Math.floor(Math.random() * candidates.length)];
+                picks.push(pick);
+            }
+
+            return picks;
+        }
+
+        function resetGlobalPool(totalNumbers) {
+            globalTotalNumbers = totalNumbers;
+            currentDrawnCount = 0;
+            globalUsedNumbers = new Set();
+            drawnList.innerHTML = "";
+        }
+
+        function resetDrawState(game, resetGlobal, clearDisplayed) {
+            currentGame = game;
+            currentRound = 0;
+            roundIndex = 0;
+            roundPool = [];
+            currentDrawnCount = 0;
+            if (resetGlobal) {
+                resetGlobalPool(globalTotalNumbers);
+            }
+            if (clearDisplayed) {
+                displayedDrawnNumbers = [];
+                drawnList.innerHTML = "";
+            }
+            if (drawTimer) {
+                clearInterval(drawTimer);
+                drawTimer = null;
+            }
+            startBtn.disabled = false;
+            startBtn.textContent = "Start";
+            statusEl.textContent = "\u672a\u5f00\u59cb\u62bd\u53d6";
+        }
+
+        function renderDrawnList(currentNumber) {
+            drawnList.innerHTML = "";
+            displayedDrawnNumbers.forEach((num) => {
+                const pill = document.createElement("span");
+                pill.className = "num";
+                if (num === currentNumber) {
+                    pill.classList.add("current");
+                }
+                pill.textContent = String(num).padStart(2, "0");
+                drawnList.appendChild(pill);
+            });
+        }
+
+        function highlightDrawn(number) {
+            const targets = document.querySelectorAll(`.track:not(.randomizing) .num[data-num="${number}"]`);
+            targets.forEach((pill) => {
+                pill.classList.remove("drawn-anim");
+                void pill.offsetWidth;
+                pill.classList.add("drawn-anim");
+            });
+        }
+
+        function updateStatus(game, totalIndex, inRound, round) {
+            statusEl.textContent = `\u5f53\u524d\u62bd\u5230\u7b2c ${totalIndex} \u4eba \u00b7 \u672c\u8f6e\u7b2c ${inRound} \u4e2a \u00b7 \u7b2c ${round} \u8f6e / \u5171 ${game.rounds} \u8f6e`;
+        }
+
+        function startDraw() {
+            if (!currentGame || drawTimer) {
+                return;
+            }
+            if (currentRound >= currentGame.rounds) {
+                resetDrawState(currentGame, true, true);
+            }
+            if (globalUsedNumbers.size >= getEligibleCount()) {
+                statusEl.textContent = "\u5df2\u62bd\u5b8c\u5168\u90e8\u53f7\u7801\uff0c\u8bf7\u91cd\u7f6e\u518d\u5f00\u59cb";
+                startBtn.disabled = false;
+                startBtn.textContent = "Restart";
+                return;
+            }
+            currentRound += 1;
+            roundIndex = 0;
+            roundPool = buildSegmentRoundPool(currentGame, currentRound);
+            if (!roundPool || roundPool.length < currentGame.winnersPerRound) {
+                statusEl.textContent = "\u5f53\u524d\u5206\u6bb5\u53f7\u7801\u4e0d\u8db3\uff0c\u8bf7\u91cd\u7f6e\u540e\u518d\u62bd";
+                startBtn.disabled = false;
+                startBtn.textContent = "Restart";
+                return;
+            }
+            startBtn.disabled = true;
+            startBtn.textContent = "Running...";
+            drawTimer = setInterval(() => {
+                roundIndex += 1;
+                if (roundIndex > roundPool.length) {
+                    clearInterval(drawTimer);
+                    drawTimer = null;
+                    startBtn.disabled = false;
+                    startBtn.textContent = currentRound >= currentGame.rounds ? "Restart" : "Next Round";
+                    return;
+                }
+                const currentNumber = roundPool[roundIndex - 1];
+                currentDrawnCount += 1;
+                globalUsedNumbers.add(currentNumber);
+                displayedDrawnNumbers.push(currentNumber);
+                updateStatus(currentGame, currentDrawnCount, roundIndex, currentRound);
+                renderDrawnList(currentNumber);
+                highlightDrawn(String(currentNumber));
+            }, 700);
+        }
+
+        function renderButtons(config, activeKey) {
+            switcher.innerHTML = "";
+            config.games.forEach((game) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "game-btn";
+                if (game.key === activeKey) {
+                    button.classList.add("active");
+                }
+                button.textContent = game.label;
+                button.addEventListener("click", () => {
+                    renderButtons(config, game.key);
+                    applyDirections(game);
+                    buildTracks(game);
+                    resetDrawState(game, false, true);
+                });
+                switcher.appendChild(button);
+            });
+        }
+
+        function init(config) {
+            const activeKey = config.defaultGame || config.games[0].key;
+            const activeGame = config.games.find((game) => game.key === activeKey) || config.games[0];
+            globalTotalNumbers = Number.isInteger(config.globalTotalNumbers)
+                ? config.globalTotalNumbers
+                : 60;
+            if (config.excludedRange && Number.isInteger(config.excludedRange.min) && Number.isInteger(config.excludedRange.max)) {
+                excludedRange = {
+                    min: config.excludedRange.min,
+                    max: config.excludedRange.max
+                };
+            } else {
+                excludedRange = null;
+            }
+            renderButtons(config, activeGame.key);
+            applyDirections(activeGame);
+            buildTracks(activeGame);
+            resetDrawState(activeGame, true, true);
+        }
+
+        if (window.GAME_CONFIG) {
+            init(window.GAME_CONFIG);
+        } else {
+            console.error("Missing GAME_CONFIG. Check game-config.js.");
+        }
+
+        startBtn.addEventListener("click", startDraw);
+    </script>
+</body>
+</html>

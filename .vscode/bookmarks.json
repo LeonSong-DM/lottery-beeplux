@@ -1,0 +1,44 @@
+{
+	"files": [
+		{
+			"path": "server/server.js",
+			"bookmarks": [
+				{
+					"line": 210,
+					"column": 3,
+					"label": "加载excel文件"
+				}
+			]
+		},
+		{
+			"path": "product/src/lottery/index.js",
+			"bookmarks": [
+				{
+					"line": 16,
+					"column": 9,
+					"label": "屏蔽号码"
+				},
+				{
+					"line": 980,
+					"column": 0,
+					"label": "games跳转页面"
+				}
+			]
+		},
+		{
+			"path": "product/games/game-config.js",
+			"bookmarks": [
+				{
+					"line": 1,
+					"column": 0,
+					"label": "游戏总人数"
+				},
+				{
+					"line": 2,
+					"column": 0,
+					"label": "忽略人数"
+				}
+			]
+		}
+	]
+}
