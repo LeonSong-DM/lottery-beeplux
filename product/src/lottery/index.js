@@ -911,8 +911,8 @@ window.onload = function () {
     stopAnimate = false,
     musicBox = document.querySelector("#musicBox"),
     fullScreenBox = document.querySelector("#fullScreenBox"),
-    gameBox = document.querySelector("#gameBox");
-    // voteBox = this.document.querySelector("#voteBox")
+    gameBox = document.querySelector("#gameBox"),
+    voteBox = document.querySelector("#VoteBox");
 
   function animate() {
     requestAnimationFrame(function () {
@@ -983,8 +983,8 @@ window.onload = function () {
     });
   }
 
-  if (VoteBox) {
-    VoteBox.addEventListener("click", function () {
+  if (voteBox) {
+    voteBox.addEventListener("click", function () {
       window.location.href = "./games/vote.html";
     });
   }
