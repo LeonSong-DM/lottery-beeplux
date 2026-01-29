@@ -29,7 +29,12 @@
 					"label": "名牌信息"
 				},
 				{
-					"line": 980,
+					"line": 914,
+					"column": 0,
+					"label": "voteBox"
+				},
+				{
+					"line": 981,
 					"column": 0,
 					"label": "games跳转页面"
 				}
