@@ -912,6 +912,7 @@ window.onload = function () {
     musicBox = document.querySelector("#musicBox"),
     fullScreenBox = document.querySelector("#fullScreenBox"),
     gameBox = document.querySelector("#gameBox");
+    // voteBox = this.document.querySelector("#voteBox")
 
   function animate() {
     requestAnimationFrame(function () {
@@ -979,6 +980,12 @@ window.onload = function () {
   if (gameBox) {
     gameBox.addEventListener("click", function () {
       window.location.href = "./games/index.html";
+    });
+  }
+
+  if (VoteBox) {
+    VoteBox.addEventListener("click", function () {
+      window.location.href = "./games/vote.html";
     });
   }
 
