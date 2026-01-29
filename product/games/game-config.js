@@ -1,5 +1,5 @@
 window.GAME_CONFIG = {
-  globalTotalNumbers: 60,
+  globalTotalNumbers: 70,
   excludedRange: { min: 1, max: 17 },
   defaultGame: "Game1",
   games: [

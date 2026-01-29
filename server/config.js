@@ -10,7 +10,7 @@ const prizes = [
   {
     type: 0,
     count: 1,
-    text: "特等奖",
+    text: "神秘大奖",
     title: "",
     img: "../img/边牧.png"
   },

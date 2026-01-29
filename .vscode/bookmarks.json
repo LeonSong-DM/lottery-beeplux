@@ -19,6 +19,16 @@
 					"label": "屏蔽号码"
 				},
 				{
+					"line": 415,
+					"column": 45,
+					"label": "create_card"
+				},
+				{
+					"line": 778,
+					"column": 4,
+					"label": "名牌信息"
+				},
+				{
 					"line": 980,
 					"column": 0,
 					"label": "games跳转页面"
@@ -37,6 +47,16 @@
 					"line": 2,
 					"column": 0,
 					"label": "忽略人数"
+				}
+			]
+		},
+		{
+			"path": "product/src/lottery/index.css",
+			"bookmarks": [
+				{
+					"line": 92,
+					"column": 4,
+					"label": ".element .details"
 				}
 			]
 		}

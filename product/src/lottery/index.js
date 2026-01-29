@@ -413,7 +413,7 @@ function createCard(user, isBold, id, showTable) {
 
   element.appendChild(createElement("name", user[1]));
 
-  element.appendChild(createElement("details", user[0] + "<br/>" + user[2]));
+  // element.appendChild(createElement("details", user[0] + "<br/>" + user[2]));
   return element;
 }
 
@@ -781,7 +781,7 @@ function changeCard(cardIndex, user) {
 
   card.innerHTML = `<div class="company">${COMPANY}</div><div class="name">${
     user[1]
-  }</div><div class="details">${user[0] || ""}<br/>${user[2] || "PSST"}</div>`;
+  }</div>`;
 }
 
 /**
