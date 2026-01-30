@@ -8,7 +8,7 @@ window.GAME_CONFIG = {
       label: "赶马",
       winnersPerRound: 2,   // 每回合抽取人数
       rounds: 5,            // 抽取回合数
-      scrollDurationSeconds: 5,
+      scrollDurationSeconds: 70,
       rowDirections: ["left", "right", "left"],
       randomizeRows: true,
       randomRefreshMs: 500
@@ -18,7 +18,7 @@ window.GAME_CONFIG = {
       label: "番茄接力大作战",
       winnersPerRound: 5,
       rounds: 2,
-      scrollDurationSeconds: 5,
+      scrollDurationSeconds: 70,
       rowDirections: ["left", "right", "left"],
       randomizeRows: true,
       randomRefreshMs: 1200
