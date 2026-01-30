@@ -1,7 +1,7 @@
-部署到服务器（Nginx 反代到本地 8888，挂载到 /lottery/）
+部署到服务器（Nginx 反代到本地 8090，挂载到 /lottery/）
 
 本指南目标：
-- 后端服务监听本机 8888 端口
+- 后端服务监听本机 8090 端口
 - Nginx 将 https://你的域名/lottery/ 转发到该后端
 - 服务器域名根路径已有服务，/lottery/ 单独使用本项目
 
@@ -16,15 +16,15 @@
 构建完成后产物在：
    product/dist
 
-二、启动后端（监听 8888）
+二、启动后端（监听 8090）
 后端服务会从“当前工作目录”提供静态文件，因此需要在 product/dist 下启动 server.js：
 
    cd /path/to/lottery/product/dist
-   node ../../server/server.js 8888
+   node ../../server/server.js 8090
 
 验证：
-   curl -X POST http://127.0.0.1:8888/getUsers
-   curl -X POST http://127.0.0.1:8888/getTempData
+   curl -X POST http://127.0.0.1:8090/getUsers
+   curl -X POST http://127.0.0.1:8090/getTempData
 
 三、建议用 systemd 守护进程
 示例：/etc/systemd/system/lottery.service
@@ -36,7 +36,7 @@
    [Service]
    Type=simple
    WorkingDirectory=/path/to/lottery/product/dist
-   ExecStart=/usr/bin/node /path/to/lottery/server/server.js 8888
+   ExecStart=/usr/bin/node /path/to/lottery/server/server.js 8090
    Restart=always
    RestartSec=3
    User=www-data
@@ -55,7 +55,7 @@
 把以下片段放到你已有的 server 块内（域名根路径已有服务时，只新增 /lottery/ 这一段即可）：
 
    location /lottery/ {
-       proxy_pass http://127.0.0.1:8888/;
+       proxy_pass http://127.0.0.1:8090/;
        proxy_http_version 1.1;
        proxy_set_header Host $host;
        proxy_set_header X-Real-IP $remote_addr;
@@ -97,7 +97,7 @@
 如果根路径服务不占用这些接口，可以在 Nginx 增加以下规则：
 
    location ~ ^/(getTempData|getUsers|saveData|reset|errorData|export)$ {
-       proxy_pass http://127.0.0.1:8888;
+       proxy_pass http://127.0.0.1:8090;
        proxy_http_version 1.1;
        proxy_set_header Host $host;
        proxy_set_header X-Real-IP $remote_addr;
