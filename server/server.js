@@ -144,7 +144,7 @@ router.post("/export", (req, res, next) => {
     outData = outData.concat(luckyData[item.type] || []);
   });
 
-  writeXML(outData, "/抽奖结果.xlsx")
+  writeXML(outData, "抽奖结果.xlsx")
     .then(dt => {
       // res.download('/抽奖结果.xlsx');
       res.status(200).json({
